@@ -10,7 +10,6 @@ public class TicTacToeGUI extends JFrame {
     private char currentPlayer;
     private final int gameType; //游戏模式(0:PVE 1:PVP)
     private final int gameLevel; //游戏难度(0:PVP 1:easy 2:middle 3:hard)
-    private AIMove ai;
 
     public TicTacToeGUI(int gameType, int gameLevel) {
         this.gameType = gameType;
@@ -71,7 +70,12 @@ public class TicTacToeGUI extends JFrame {
                     if (gameType == 1)
                         currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
                     if (gameType == 0) {//如果是PVE 则电脑下棋
-                        AIMove.makeBestMove(board);
+                        if(gameLevel==1)
+                            AIMove.moveEazy(board);
+                        if(gameLevel==2)
+                            ;
+                        if(gameLevel==3)
+                            AIMove.moveHard(board);
                         displayBoard();
                         //判断游戏是否结束
                         //将当前玩家切换为 O 判断是否胜利

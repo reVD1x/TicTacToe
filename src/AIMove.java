@@ -1,21 +1,16 @@
 import java.util.Random;
 
 public class AIMove {
-    private int level;
     public int row, col;
 
-    public AIMove(int level) {
-        this.level = level;
+    public static void moveEazy(TicTacToeBoard tboard) {
+        int[] move = {-1, -1};
+        // 生成随机数
+        Random random = new Random();
+        move[0] = random.nextInt(3);
+        move[1] = random.nextInt(3);
+        tboard.makeMove(move[0], move[1]);
     }
-
-    /*public void moveEazy() {
-        do {
-            //生成随机数
-            Random random = new Random();
-            row = random.nextInt(3);
-            col = random.nextInt(3);
-        } while (!makeMove(row, col));
-    }*/
 
 
     public static int minimax(TicTacToeBoard tboard, int depth, boolean isMaximizing, int alpha, int beta) {
@@ -48,7 +43,7 @@ public class AIMove {
             int minEval = Integer.MAX_VALUE;
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
-                    if (tboard.board[i][j] == ' ') {
+                    if (tboard.board[i][j] == '-') {
                         tboard.board[i][j] = 'X';
                         int eval = minimax(tboard, depth + 1, true, alpha, beta);
                         tboard.board[i][j] = '-';  // 恢复棋盘，撤销移动
@@ -65,7 +60,7 @@ public class AIMove {
         }
     }
 
-    public static void makeBestMove(TicTacToeBoard tboard) {
+    public static void moveHard(TicTacToeBoard tboard) {
         int bestScore = Integer.MIN_VALUE;
         int[] move = {-1, -1};
         for (int i = 0; i < 3; i++)
