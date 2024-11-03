@@ -1,3 +1,5 @@
+package TicTacToe;
+
 import javax.swing.*;
 
 public class TicTacToeGame {

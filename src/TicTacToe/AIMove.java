@@ -1,3 +1,5 @@
+package TicTacToe;
+
 import java.util.Random;
 
 public class AIMove {
