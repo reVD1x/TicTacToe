@@ -5,31 +5,48 @@ import java.util.Random;
 
 public class AIMove {
     public int row, col;
+    public TicTacToeBoard board;
+    public int gameLevel;
+
+    public AIMove(TicTacToeBoard board, int gameLevel) {
+        this.board = board;
+        this.gameLevel = gameLevel;
+    }
+
+    public void move() {
+        if (gameLevel == 1)
+            moveEasy(board);
+        else if (gameLevel == 2)
+            moveMiddle(board);
+        else if (gameLevel == 3)
+            moveHard(board);
+    }
 
     // 简单 AI
-    public static void moveEasy(TicTacToeBoard tboard) {
-        int[] move = {-1, -1};
-        // 生成随机数
-        Random random = new Random();
-        move[0] = random.nextInt(3);
-        move[1] = random.nextInt(3);
-        tboard.makeMove(move[0], move[1]);
+    public void moveEasy(TicTacToeBoard tboard) {
+        do{
+            Random random = new Random();  // 生成随机数
+            row = random.nextInt(3);
+            col = random.nextInt(3);
+        } while (!tboard.makeMove(row, col));
     }
 
     // 检查有无线差一个棋子胜利
-    private static boolean checkLine(TicTacToeBoard tboard, int row, int col, int addRow, int addCol, char player) {
+    private boolean checkLine(TicTacToeBoard tboard, int row, int col, int addRow, int addCol, char player) {
         int nextRow = (row + addRow) % 3;
         int nextCol = (col + addCol) % 3;
         if (tboard.getBoardValue(nextRow, nextCol) == player &&
                 tboard.getBoardValue((nextRow + addRow) % 3, (nextCol + addCol) % 3) == '-') {
-            tboard.makeMove((nextRow + addRow) % 3, (nextCol + addCol) % 3);
+            row = (nextRow + addRow) % 3;
+            col = (nextCol + addCol) % 3;
+            tboard.makeMove(row, col);
             return true;
         }
         return false;
     }
 
     // 检查是否有任何行和列或对角线差一个格子就赢
-    private static boolean canWin(char player, ArrayList<int[]> list, TicTacToeBoard tboard) {
+    private boolean canWin(char player, ArrayList<int[]> list, TicTacToeBoard tboard) {
         for (int[] cell : list) {
             int row = cell[0];
             int col = cell[1];
@@ -54,7 +71,7 @@ public class AIMove {
     }
 
     // 中级 AI
-    public static void moveMiddle(TicTacToeBoard tboard) {
+    public void moveMiddle(TicTacToeBoard tboard) {
         ArrayList<int[]> listO = new ArrayList<>();
         ArrayList<int[]> listX = new ArrayList<>();
 
@@ -80,7 +97,9 @@ public class AIMove {
 
         // 若双方都没达到胜利的条件，优先占据中心
         if (tboard.getBoardValue(1, 1) == '-') {
-            tboard.makeMove(1, 1);
+            row = 1;
+            col = 1;
+            tboard.makeMove(row, col);
             return;
         }
 
@@ -89,7 +108,7 @@ public class AIMove {
     }
 
     // minimax 算法评估下在各点的分数
-    public static int minimax(TicTacToeBoard tboard, int depth, boolean isMaximizing, int alpha, int beta) {
+    public int minimax(TicTacToeBoard tboard, int depth, boolean isMaximizing, int alpha, int beta) {
         char result = tboard.checkWinner();
         if (result != '-')
             return result == 'O' ? 10 : -10;
@@ -137,9 +156,8 @@ public class AIMove {
     }
 
     // 困难 AI
-    public static void moveHard(TicTacToeBoard tboard) {
+    public void moveHard(TicTacToeBoard tboard) {
         int bestScore = Integer.MIN_VALUE;
-        int[] move = {-1, -1};
         for (int i = 0; i < 3; i++)
             for (int j = 0; j < 3; j++)
                 if (tboard.board[i][j] == '-') {
@@ -150,10 +168,10 @@ public class AIMove {
 
                     if (score > bestScore) {
                         bestScore = score;
-                        move[0] = i;
-                        move[1] = j;
+                        row = i;
+                        col = j;
                     }
                 }
-        tboard.makeMove(move[0], move[1]);
+        tboard.makeMove(row, col);
     }
 }

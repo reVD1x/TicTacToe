@@ -2,7 +2,7 @@ package TicTacToe;
 
 public class TicTacToeBoard {
     public char[][] board; // 棋盘
-    private char currentPlayer; // 当前玩家
+    public char currentPlayer; // 当前玩家
 
     public TicTacToeBoard() {
         board = new char[3][3];
@@ -21,7 +21,6 @@ public class TicTacToeBoard {
     public boolean makeMove(int row, int col) {
         if (board[row][col] == '-') {
             board[row][col] = currentPlayer;
-            currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
             return true;  // 下到正确位置
         }
         return false;  // 未下到正确位置
