@@ -73,9 +73,9 @@ public class TicTacToeGUI extends JFrame {
                         currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
                     if (gameType == 0) {//如果是PVE 则电脑下棋
                         if(gameLevel==1)
-                            AIMove.moveEazy(board);
+                            AIMove.moveEasy(board);
                         if(gameLevel==2)
-                            ;
+                            AIMove.moveMiddle(board);
                         if(gameLevel==3)
                             AIMove.moveHard(board);
                         displayBoard();
@@ -117,21 +117,10 @@ public class TicTacToeGUI extends JFrame {
         }
         return false;
     }
-
-    private void checkWinnerOrDraw() {
-        if (hasWinner() || isDraw()) {
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    buttons[i][j].setEnabled(false);
-                }
-            }
-        }
-    }
-
+    // 重新开始游戏
     private void resetGame() {
-        //重新开始游戏
-        //清空棋盘
-        board.clearBoard();
+
+        board.clearBoard();  // 清空棋盘
         dispose();//关闭当前窗口
         new StartFrame();
     }
