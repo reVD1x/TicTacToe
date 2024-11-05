@@ -11,7 +11,7 @@ public class TicTacToeGUI {
     private final JButton[][] buttons = new JButton[3][3];
     private AIMove ai;
 
-    private final int gameType; //游戏模式(0:PVE 1:PVP)
+    private final int gameType; //游戏模式
     private final TicTacToeBoard board;
 
     // 构造方法
@@ -107,6 +107,30 @@ public class TicTacToeGUI {
         private boolean hasWinner() {//判断是否胜利
             char winner = board.checkWinner();
             if (winner != '-') {
+                if (gameType == 2) {
+                    if (winner == 'X')
+                        TicTacToeGame.xWins++;
+                    else if (winner == 'O')
+                        TicTacToeGame.oWins++;
+                } else if (gameType == 1) {
+                    if (ai.gameLevel == 1) {
+                        if (winner == 'X')
+                            TicTacToeGame.easyWins++;
+                        else if (winner == 'O')
+                            TicTacToeGame.easyLosses++;
+                    } else if (ai.gameLevel == 2) {
+                        if (winner == 'X')
+                            TicTacToeGame.mediumWins++;
+                        else if (winner == 'O')
+                            TicTacToeGame.mediumLosses++;
+                    } else if (ai.gameLevel == 3) {
+                        if (winner == 'X')
+                            TicTacToeGame.hardWins++;
+                        else if (winner == 'O')
+                            TicTacToeGame.hardLosses++;
+                    }
+                }
+
                 int option = JOptionPane.showOptionDialog(frame, winner + " wins!", "选择下一步选项",
                         JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE,
                         null, new Object[]{"退出", "再玩一次"}, "再玩一次");
@@ -120,6 +144,17 @@ public class TicTacToeGUI {
 
         private boolean isDraw() {//判断是否平局
             if (board.isBoardFull()) {
+                if (gameType == 2)
+                    TicTacToeGame.draws++;
+                else if (gameType == 1) {
+                    if (ai.gameLevel == 1)
+                        TicTacToeGame.easyDraws++;
+                    else if (ai.gameLevel == 2)
+                        TicTacToeGame.mediumDraws++;
+                    else if (ai.gameLevel == 3)
+                        TicTacToeGame.hardDraws++;
+                }
+
                 int option = JOptionPane.showOptionDialog(frame, "平局!", "选择下一步选项",
                         JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE,
                         null, new Object[]{"退出", "再玩一次"}, "再玩一次");
@@ -139,8 +174,8 @@ public class TicTacToeGUI {
         }
 
         private void returnToMainMenu() {
-            resetGame();
             frame.dispose(); // 关闭当前游戏窗口
+            instance=null;  // 释放实例
             TicTacToeGame.main(new String[]{}); // 重新启动主菜单
         }
     }
