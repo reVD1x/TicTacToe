@@ -1,5 +1,8 @@
 package TicTacToe;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -22,6 +25,9 @@ public class TicTacToeGame {
     public static int hardLosses = 0;
     public static int hardDraws = 0;
 
+    private static Clip clickSound;
+    private static Clip mainBGM;
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("井字棋");
@@ -29,15 +35,37 @@ public class TicTacToeGame {
             frame.setSize(300, 200);
             addModeSelectionPanel(frame);
             frame.setVisible(true);
+
+            // 加载背景音乐
+            try {
+                AudioInputStream audioInputStream =
+                        AudioSystem.getAudioInputStream(TicTacToeGame.class.getResource("resources/mainBGM.wav"));
+                mainBGM = AudioSystem.getClip();
+                mainBGM.open(audioInputStream);
+                mainBGM.loop(Clip.LOOP_CONTINUOUSLY); // 循环播放
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // 加载点击音效
+            try {
+                AudioInputStream audioInputStream =
+                        AudioSystem.getAudioInputStream(TicTacToeGame.class.getResource("resources/Click.wav"));
+                clickSound = AudioSystem.getClip();
+                clickSound.open(audioInputStream);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
+
 
     private static void addModeSelectionPanel(JFrame frame) {
         JPanel modePanel = new JPanel(new GridLayout(4, 1, 5, 5));
         frame.add(modePanel);
 
         JLabel modeLabel = new JLabel("选择模式", SwingConstants.CENTER);
-        modeLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        modeLabel.setFont(new Font("黑体", Font.BOLD, 18));
         modePanel.add(modeLabel);
 
         JPanel radioPanel = new JPanel(new GridLayout(1, 2, 5, 5)); // 1行2列，组件之间有5像素的间距
@@ -55,6 +83,7 @@ public class TicTacToeGame {
         nextButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                playClickSound();
                 if (singlePlayer.isSelected()) {
                     showDifficultySelection(frame);
                 } else if (multiPlayer.isSelected()) {
@@ -66,11 +95,17 @@ public class TicTacToeGame {
         buttonPanel.add(nextButton);
 
         JButton statsButton = new JButton("数据统计");
-        statsButton.addActionListener(e -> showStatisticsPage(frame));
+        statsButton.addActionListener(e -> {
+            playClickSound();
+            showStatisticsPage(frame);
+        });
         buttonPanel.add(statsButton);
 
         JButton exitButton = new JButton("退出");
-        exitButton.addActionListener(e -> System.exit(0));
+        exitButton.addActionListener(e -> {
+            playClickSound();
+            System.exit(0);
+        });
         buttonPanel.add(exitButton);
 
         modePanel.add(buttonPanel);
@@ -84,7 +119,7 @@ public class TicTacToeGame {
         frame.add(statsPanel);
 
         JLabel statsLabel = new JLabel("数据统计", SwingConstants.CENTER);
-        statsLabel.setFont(new Font("Arial", Font.BOLD, 18)); // 加大加粗标题
+        statsLabel.setFont(new Font("黑体", Font.BOLD, 18)); // 加大加粗标题
         statsPanel.add(statsLabel);
 
         // 假设的数据统计
@@ -110,6 +145,7 @@ public class TicTacToeGame {
 
         JButton backButton = new JButton("返回");
         backButton.addActionListener(e -> {
+            playClickSound();
             frame.getContentPane().removeAll();
             frame.setSize(300, 200);
             addModeSelectionPanel(frame);
@@ -141,7 +177,7 @@ public class TicTacToeGame {
         frame.add(difficultyPanel);
 
         JLabel difficultyLabel = new JLabel("选择难度", SwingConstants.CENTER);
-        difficultyLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        difficultyLabel.setFont(new Font("黑体", Font.BOLD, 18));
         difficultyPanel.add(difficultyLabel);
 
         JPanel radioPanel = new JPanel(new GridLayout(1, 3, 5, 5)); // 1行3列，组件之间有5像素的间距
@@ -162,6 +198,7 @@ public class TicTacToeGame {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                playClickSound();
                 int difficulty = 0;
                 if (easy.isSelected()) {
                     difficulty = 1;
@@ -180,6 +217,7 @@ public class TicTacToeGame {
 
         JButton backButton = new JButton("返回");
         backButton.addActionListener(e -> {
+            playClickSound();
             frame.getContentPane().removeAll();
             addModeSelectionPanel(frame);
             frame.revalidate();
@@ -196,5 +234,14 @@ public class TicTacToeGame {
     private static void startGame(int mode, int difficulty) {
         TicTacToeGUI gui = TicTacToeGUI.getInstance(mode, difficulty);
         gui.showGame();
+    }
+
+    private static void playClickSound() {
+        if (clickSound != null && clickSound.isRunning())
+            clickSound.stop(); // 停止正在播放的音效
+        if (clickSound != null) {
+            clickSound.setFramePosition(0); // 重置音效位置
+            clickSound.start(); // 播放音效
+        }
     }
 }

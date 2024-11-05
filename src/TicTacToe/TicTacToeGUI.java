@@ -1,5 +1,8 @@
 package TicTacToe;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -10,6 +13,7 @@ public class TicTacToeGUI {
     private final JFrame frame;  // 游戏窗口
     private final JButton[][] buttons = new JButton[3][3];
     private AIMove ai;
+    private Clip clickSound;
 
     private final int gameType; //游戏模式
     private final TicTacToeBoard board;
@@ -41,6 +45,16 @@ public class TicTacToeGUI {
                 gamePanel.add(button);
                 buttons[i][j] = button;
             }
+        }
+
+        // 加载点击音效
+        try {
+            AudioInputStream audioInputStream =
+                    AudioSystem.getAudioInputStream(getClass().getResource("resources/Click.wav"));
+            clickSound = AudioSystem.getClip();
+            clickSound.open(audioInputStream);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         updateGamePanel(board);
@@ -86,6 +100,8 @@ public class TicTacToeGUI {
 
         @Override
         public void actionPerformed(ActionEvent e) {//点击事件
+            playClickSound();
+
             if (board.makeMove(row, col)) {//玩家向棋盘中下棋
                 updateGamePanel(board);
 
@@ -133,10 +149,14 @@ public class TicTacToeGUI {
 
                 int option = JOptionPane.showOptionDialog(frame, winner + " wins!", "选择下一步选项",
                         JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE,
-                        null, new Object[]{"退出", "再玩一次"}, "再玩一次");
-                if (option == JOptionPane.YES_NO_OPTION)
+                        null, new Object[]{"返回", "再玩一次"}, "再玩一次");
+                if (option == JOptionPane.YES_NO_OPTION) {
+                    playClickSound();
                     returnToMainMenu();//返回主菜单
-                else resetGame();//重来
+                } else{
+                    playClickSound();
+                    resetGame();//重来
+                }
                 return true;
             }
             return false;
@@ -157,7 +177,7 @@ public class TicTacToeGUI {
 
                 int option = JOptionPane.showOptionDialog(frame, "平局!", "选择下一步选项",
                         JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE,
-                        null, new Object[]{"退出", "再玩一次"}, "再玩一次");
+                        null, new Object[]{"返回", "再玩一次"}, "再玩一次");
                 if (option == JOptionPane.YES_NO_OPTION)
                     returnToMainMenu();//返回主菜单
                 else resetGame();//重来
@@ -177,6 +197,15 @@ public class TicTacToeGUI {
             frame.dispose(); // 关闭当前游戏窗口
             instance=null;  // 释放实例
             TicTacToeGame.main(new String[]{}); // 重新启动主菜单
+        }
+    }
+
+    private void playClickSound() {
+        if (clickSound != null && clickSound.isRunning())
+            clickSound.stop(); // 停止正在播放的音效
+        if (clickSound != null) {
+            clickSound.setFramePosition(0); // 重置音效位置
+            clickSound.start(); // 播放音效
         }
     }
 }
