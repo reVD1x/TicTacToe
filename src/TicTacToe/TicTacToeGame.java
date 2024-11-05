@@ -231,11 +231,6 @@ public class TicTacToeGame {
         frame.repaint();
     }
 
-    private static void startGame(int mode, int difficulty) {
-        TicTacToeGUI gui = TicTacToeGUI.getInstance(mode, difficulty);
-        gui.showGame();
-    }
-
     private static void playClickSound() {
         if (clickSound != null && clickSound.isRunning())
             clickSound.stop(); // 停止正在播放的音效
@@ -243,5 +238,11 @@ public class TicTacToeGame {
             clickSound.setFramePosition(0); // 重置音效位置
             clickSound.start(); // 播放音效
         }
+    }
+
+    private static void startGame(int mode, int difficulty) {
+        mainBGM.close();
+        TicTacToeGUI gui = TicTacToeGUI.getInstance(mode, difficulty);
+        gui.showGame();
     }
 }

@@ -18,6 +18,9 @@ public class TicTacToeGUI {
     private final int gameType; //游戏模式
     private final TicTacToeBoard board;
 
+    private static Clip gameBGM;
+    private static Clip overBGM;
+
     // 构造方法
     private TicTacToeGUI(int gameType, int gameLevel) {
         this.gameType = gameType;
@@ -47,12 +50,33 @@ public class TicTacToeGUI {
             }
         }
 
+        // 加载背景音乐
+        try {
+            AudioInputStream audioInputStream =
+                    AudioSystem.getAudioInputStream(TicTacToeGame.class.getResource("resources/gameBGM.wav"));
+            gameBGM = AudioSystem.getClip();
+            gameBGM.open(audioInputStream);
+            gameBGM.loop(Clip.LOOP_CONTINUOUSLY); // 循环播放
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         // 加载点击音效
         try {
             AudioInputStream audioInputStream =
                     AudioSystem.getAudioInputStream(getClass().getResource("resources/Click.wav"));
             clickSound = AudioSystem.getClip();
             clickSound.open(audioInputStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 加载结束音乐
+        try {
+            AudioInputStream audioInputStream =
+                    AudioSystem.getAudioInputStream(getClass().getResource("resources/overBGM.wav"));
+            overBGM = AudioSystem.getClip();
+            overBGM.open(audioInputStream);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -123,6 +147,9 @@ public class TicTacToeGUI {
         private boolean hasWinner() {//判断是否胜利
             char winner = board.checkWinner();
             if (winner != '-') {
+                gameBGM.stop();
+                playOverBGM();
+
                 if (gameType == 2) {
                     if (winner == 'X')
                         TicTacToeGame.xWins++;
@@ -151,9 +178,11 @@ public class TicTacToeGUI {
                         JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE,
                         null, new Object[]{"返回", "再玩一次"}, "再玩一次");
                 if (option == JOptionPane.YES_NO_OPTION) {
+                    overBGM.close();
                     playClickSound();
                     returnToMainMenu();//返回主菜单
                 } else{
+                    overBGM.close();
                     playClickSound();
                     resetGame();//重来
                 }
@@ -164,6 +193,9 @@ public class TicTacToeGUI {
 
         private boolean isDraw() {//判断是否平局
             if (board.isBoardFull()) {
+                gameBGM.stop();
+                playOverBGM();
+
                 if (gameType == 2)
                     TicTacToeGame.draws++;
                 else if (gameType == 1) {
@@ -178,22 +210,29 @@ public class TicTacToeGUI {
                 int option = JOptionPane.showOptionDialog(frame, "平局!", "选择下一步选项",
                         JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE,
                         null, new Object[]{"返回", "再玩一次"}, "再玩一次");
-                if (option == JOptionPane.YES_NO_OPTION)
+                if (option == JOptionPane.YES_NO_OPTION) {
+                    overBGM.close();
+                    playClickSound();
                     returnToMainMenu();//返回主菜单
-                else resetGame();//重来
-                return true;
+                } else{
+                    overBGM.close();
+                    playClickSound();
+                    resetGame();//重来
+                }
             }
             return false;
         }
 
         // 重新开始游戏
         private void resetGame() {
+            gameBGM.start();
             board.clearBoard();  // 清空棋盘
             updateGamePanel(board);
             board.currentPlayer = 'X'; // 重置当前玩家
         }
 
         private void returnToMainMenu() {
+            gameBGM.close();
             frame.dispose(); // 关闭当前游戏窗口
             instance=null;  // 释放实例
             TicTacToeGame.main(new String[]{}); // 重新启动主菜单
@@ -206,6 +245,15 @@ public class TicTacToeGUI {
         if (clickSound != null) {
             clickSound.setFramePosition(0); // 重置音效位置
             clickSound.start(); // 播放音效
+        }
+    }
+
+    private void playOverBGM() {
+        if (overBGM != null && overBGM.isRunning())
+            overBGM.stop(); // 停止正在播放的音效
+        if (overBGM != null) {
+            overBGM.setFramePosition(0); // 重置音效位置
+            overBGM.start(); // 播放音效
         }
     }
 }
