@@ -9,25 +9,26 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class TicTacToeGame {
-    public static int xWins = 0;
-    public static int oWins = 0;
-    public static int draws = 0;
+    public static int xWins = 0;    // 双人模式 X 胜利次数
+    public static int oWins = 0;    // 双人模式 O 胜利次数
+    public static int draws = 0;    // 双人模式平局次数
 
-    public static int easyWins = 0;
-    public static int easyLosses = 0;
-    public static int easyDraws = 0;
+    public static int easyWins = 0;     // 单人模式简单难度胜利次数
+    public static int easyLosses = 0;   // 单人模式简单难度失败次数
+    public static int easyDraws = 0;    // 单人模式简单难度平局次数
 
-    public static int mediumWins = 0;
-    public static int mediumLosses = 0;
-    public static int mediumDraws = 0;
+    public static int mediumWins = 0;   // 单人模式中等难度胜利次数
+    public static int mediumLosses = 0; // 单人模式中等难度失败次数
+    public static int mediumDraws = 0;  // 单人模式中等难度平局次数
 
-    public static int hardWins = 0;
-    public static int hardLosses = 0;
-    public static int hardDraws = 0;
+    public static int hardWins = 0;     // 单人模式困难难度胜利次数
+    public static int hardLosses = 0;   // 单人模式困难难度失败次数
+    public static int hardDraws = 0;    // 单人模式困难难度平局次数
 
-    private static Clip clickSound;
-    private static Clip mainBGM;
+    private static Clip clickSound; // 点击音效
+    private static Clip mainBGM;    // 主界面背景音乐
 
+    // main 方法
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("井字棋");
@@ -59,7 +60,7 @@ public class TicTacToeGame {
         });
     }
 
-
+    // 添加模式选择面板
     private static void addModeSelectionPanel(JFrame frame) {
         JPanel modePanel = new JPanel(new GridLayout(4, 1, 5, 5));
         frame.add(modePanel);
@@ -68,7 +69,7 @@ public class TicTacToeGame {
         modeLabel.setFont(new Font("黑体", Font.BOLD, 18));
         modePanel.add(modeLabel);
 
-        JPanel radioPanel = new JPanel(new GridLayout(1, 2, 5, 5)); // 1行2列，组件之间有5像素的间距
+        JPanel radioPanel = new JPanel(new GridLayout(1, 2, 5, 5));
         JRadioButton singlePlayer = new JRadioButton("单人模式");
         JRadioButton multiPlayer = new JRadioButton("双人模式");
         ButtonGroup modeGroup = new ButtonGroup();
@@ -78,7 +79,7 @@ public class TicTacToeGame {
         radioPanel.add(multiPlayer);
         modePanel.add(radioPanel);
 
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 5, 5)); // 1行3列的网格布局
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 5, 5));
         JButton nextButton = new JButton("下一步");
         nextButton.addActionListener(new ActionListener() {
             @Override
@@ -87,8 +88,8 @@ public class TicTacToeGame {
                 if (singlePlayer.isSelected()) {
                     showDifficultySelection(frame);
                 } else if (multiPlayer.isSelected()) {
-                    startGame(2, 0); // 双人模式，难度为0
-                    frame.dispose(); // 关闭选择窗口
+                    startGame(2, 0);    // 双人模式，难度为0
+                    frame.dispose();    // 关闭选择窗口
                 }
             }
         });
@@ -104,13 +105,14 @@ public class TicTacToeGame {
         JButton exitButton = new JButton("退出");
         exitButton.addActionListener(e -> {
             playClickSound();
-            System.exit(0);
+            System.exit(0); // 退出程序
         });
         buttonPanel.add(exitButton);
 
         modePanel.add(buttonPanel);
     }
 
+    // 显示数据统计页面
     private static void showStatisticsPage(JFrame frame) {
         frame.getContentPane().removeAll();
         frame.setSize(300, 400);
@@ -122,7 +124,7 @@ public class TicTacToeGame {
         statsLabel.setFont(new Font("黑体", Font.BOLD, 18)); // 加大加粗标题
         statsPanel.add(statsLabel);
 
-        // 假设的数据统计
+        // 数据统计
         JLabel multiPlayerLabel = new JLabel("双人对战:");
         statsPanel.add(multiPlayerLabel);
         JPanel multiPlayerStatsPanel = new JPanel(new GridLayout(1, 3, 5, 5));
@@ -158,6 +160,7 @@ public class TicTacToeGame {
         frame.repaint();
     }
 
+    // 显示单人模式数据统计
     private static void singlePlayerStatsDisplay(JPanel statsPanel, JLabel easyLabel, int easyWins, int easyLosses, int easyDraws) {
         statsPanel.add(easyLabel);
         JPanel easyStatsPanel = new JPanel(new GridLayout(1, 3, 5, 5));
@@ -170,6 +173,7 @@ public class TicTacToeGame {
         statsPanel.add(easyStatsPanel);
     }
 
+    // 显示难度选择页面
     private static void showDifficultySelection(JFrame frame) {
         frame.getContentPane().removeAll();
 
@@ -180,7 +184,7 @@ public class TicTacToeGame {
         difficultyLabel.setFont(new Font("黑体", Font.BOLD, 18));
         difficultyPanel.add(difficultyLabel);
 
-        JPanel radioPanel = new JPanel(new GridLayout(1, 3, 5, 5)); // 1行3列，组件之间有5像素的间距
+        JPanel radioPanel = new JPanel(new GridLayout(1, 3, 5, 5));
         JRadioButton easy = new JRadioButton("简单");
         JRadioButton medium = new JRadioButton("中等");
         JRadioButton hard = new JRadioButton("困难");
@@ -193,7 +197,7 @@ public class TicTacToeGame {
         radioPanel.add(hard);
         difficultyPanel.add(radioPanel);
 
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 5, 5)); // 1行2列，组件之间有5像素的间距
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 5, 5));
         JButton startButton = new JButton("开始游戏");
         startButton.addActionListener(new ActionListener() {
             @Override
@@ -208,11 +212,10 @@ public class TicTacToeGame {
                     difficulty = 3;
                 }
 
-                startGame(1, difficulty); // 单人模式
-                frame.dispose(); // 关闭选择窗口
+                startGame(1, difficulty);   // 单人模式
+                frame.dispose();    // 关闭选择窗口
             }
         });
-
         buttonPanel.add(startButton);
 
         JButton backButton = new JButton("返回");
@@ -231,15 +234,18 @@ public class TicTacToeGame {
         frame.repaint();
     }
 
+    // 播放点击音效
     private static void playClickSound() {
         if (clickSound != null && clickSound.isRunning())
-            clickSound.stop(); // 停止正在播放的音效
+            clickSound.stop();  // 停止正在播放的音效
+
         if (clickSound != null) {
             clickSound.setFramePosition(0); // 重置音效位置
             clickSound.start(); // 播放音效
         }
     }
 
+    // 开始游戏
     private static void startGame(int mode, int difficulty) {
         mainBGM.close();
         TicTacToeGUI gui = TicTacToeGUI.getInstance(mode, difficulty);

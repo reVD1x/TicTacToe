@@ -13,6 +13,7 @@ public class AIMove {
         this.gameLevel = gameLevel;
     }
 
+    // 根据当前游戏难度选择不同的移动策略
     public void move() {
         if (gameLevel == 1)
             moveEasy(board);
@@ -22,10 +23,10 @@ public class AIMove {
             moveHard(board);
     }
 
-    // 简单 AI
+    // 简单 AI 移动策略
     public void moveEasy(TicTacToeBoard board) {
-        do{
-            Random random = new Random();  // 生成随机数
+        do {
+            Random random = new Random();   // 生成随机数
             row = random.nextInt(3);
             col = random.nextInt(3);
         } while (!board.makeMove(row, col));
@@ -35,6 +36,7 @@ public class AIMove {
     private boolean checkLine(TicTacToeBoard board, int row, int col, int addRow, int addCol, char player) {
         int nextRow = (row + addRow) % 3;
         int nextCol = (col + addCol) % 3;
+
         if (board.getBoardValue(nextRow, nextCol) == player &&
                 board.getBoardValue((nextRow + addRow) % 3, (nextCol + addCol) % 3) == '-') {
             row = (nextRow + addRow) % 3;
@@ -42,6 +44,7 @@ public class AIMove {
             board.makeMove(row, col);
             return true;
         }
+
         return false;
     }
 
@@ -52,25 +55,26 @@ public class AIMove {
             int col = cell[1];
 
             // 判断所在行
-            for (int i = 1; i < 3; i++)  // i 为所判断的两格间的相对距离
+            for (int i = 1; i < 3; i++) // i 为所判断的两格间的相对距离
                 if (checkLine(board, row, col, i, 0, player))
                     return true;
 
             // 判断所在列
-            for (int i = 1; i < 3; i++)  // i 为所判断的两格间的相对距离
+            for (int i = 1; i < 3; i++) // i 为所判断的两格间的相对距离
                 if (checkLine(board, row, col, 0, i, player))
                     return true;
 
             // 判断所在对角线
             if (row == col)
-                for (int i = 1; i < 3; i++)  // i 为所判断的两格间的相对距离
+                for (int i = 1; i < 3; i++) // i 为所判断的两格间的相对距离
                     if (checkLine(board, row, col, i, i, player))
                         return true;
         }
+
         return false;
     }
 
-    // 中级 AI
+    // 中级 AI 移动策略
     public void moveMiddle(TicTacToeBoard board) {
         ArrayList<int[]> listO = new ArrayList<>();
         ArrayList<int[]> listX = new ArrayList<>();
@@ -118,53 +122,61 @@ public class AIMove {
 
         if (isMaximizing) {
             int maxEval = Integer.MIN_VALUE;
+
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
                     if (board.board[i][j] == '-') {
                         board.board[i][j] = 'O';
                         int eval = minimax(board, depth + 1, false, alpha, beta);
-                        board.board[i][j] = '-';  // 恢复棋盘，撤销移动
+                        board.board[i][j] = '-';    // 恢复棋盘，撤销移动
                         maxEval = Math.max(maxEval, eval);
+
                         alpha = Math.max(alpha, eval);
                         if (beta <= alpha)
-                            break; // Alpha-beta 剪枝
+                            break;  // Alpha-beta 剪枝
                     }
                 }
+
                 if (beta <= alpha)
-                    break; // Alpha-beta 剪枝
+                    break;  // Alpha-beta 剪枝
             }
             return maxEval;
         } else {
             int minEval = Integer.MAX_VALUE;
+
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
                     if (board.board[i][j] == '-') {
                         board.board[i][j] = 'X';
                         int eval = minimax(board, depth + 1, true, alpha, beta);
-                        board.board[i][j] = '-';  // 恢复棋盘，撤销移动
+                        board.board[i][j] = '-';    // 恢复棋盘，撤销移动
                         minEval = Math.min(minEval, eval);
+
                         beta = Math.min(beta, eval);
                         if (beta <= alpha)
                             break;  // Alpha-beta 剪枝
                     }
                 }
+
                 if (beta <= alpha)
                     break;  // Alpha-beta 剪枝
             }
+
             return minEval;
         }
     }
 
-    // 困难 AI
+    // 困难 AI 移动策略
     public void moveHard(TicTacToeBoard board) {
         int bestScore = Integer.MIN_VALUE;
+
         for (int i = 0; i < 3; i++)
             for (int j = 0; j < 3; j++)
                 if (board.board[i][j] == '-') {
                     // 模拟下棋，并递归模拟下一手
                     board.board[i][j] = 'O';
                     int score = minimax(board, 0, false, Integer.MIN_VALUE, Integer.MAX_VALUE);
-                    board.board[i][j] = '-';  // 撤销移动
+                    board.board[i][j] = '-';    // 撤销移动
 
                     if (score > bestScore) {
                         bestScore = score;
@@ -172,6 +184,7 @@ public class AIMove {
                         col = j;
                     }
                 }
+
         board.makeMove(row, col);
     }
 }

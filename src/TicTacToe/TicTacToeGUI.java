@@ -9,17 +9,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class TicTacToeGUI {
-    private static TicTacToeGUI instance;  // 单例模式实现，保证只有一个实例存在
-    private final JFrame frame;  // 游戏窗口
-    private final JButton[][] buttons = new JButton[3][3];
-    private AIMove ai;
-    private Clip clickSound;
+    private static TicTacToeGUI instance;                   // 单例模式实现，保证只有一个实例存在
+    private final JFrame frame;                             // 游戏窗口
+    private final JButton[][] buttons = new JButton[3][3];  // 按钮数组
+    private AIMove ai;                                      // AI 移动实例
+    private Clip clickSound;                                // 点击音效
 
-    private final int gameType; //游戏模式
-    private final TicTacToeBoard board;
+    private final int gameType;                             //游戏模式
+    private final TicTacToeBoard board;                     // 棋盘
 
-    private static Clip gameBGM;
-    private static Clip overBGM;
+    private static Clip gameBGM;                            // 游戏背景音乐
+    private static Clip overBGM;                            // 游戏结束音乐
 
     // 构造方法
     private TicTacToeGUI(int gameType, int gameLevel) {
@@ -35,7 +35,7 @@ public class TicTacToeGUI {
         JPanel gamePanel = new JPanel(new GridLayout(3, 3));
         frame.add(gamePanel);
 
-        //游戏难度(0:PVP 1:easy 2:middle 3:hard)
+        // 游戏难度(0:PVP 1:easy 2:middle 3:hard)
         if (gameType == 1)
             ai = new AIMove(board, gameLevel);
 
@@ -56,7 +56,7 @@ public class TicTacToeGUI {
                     AudioSystem.getAudioInputStream(TicTacToeGame.class.getResource("resources/gameBGM.wav"));
             gameBGM = AudioSystem.getClip();
             gameBGM.open(audioInputStream);
-            gameBGM.loop(Clip.LOOP_CONTINUOUSLY); // 循环播放
+            gameBGM.loop(Clip.LOOP_CONTINUOUSLY);   // 循环播放
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -113,6 +113,7 @@ public class TicTacToeGUI {
             }
     }
 
+    // 按钮点击事件监听器类
     private class ButtonClickListener implements ActionListener {
         private final int row;
         private final int col;
@@ -122,40 +123,51 @@ public class TicTacToeGUI {
             this.col = col;
         }
 
+        // 点击事件
         @Override
-        public void actionPerformed(ActionEvent e) {//点击事件
+        public void actionPerformed(ActionEvent e) {
             playClickSound();
 
-            if (board.makeMove(row, col)) {//玩家向棋盘中下棋
+            // 玩家向棋盘中下棋
+            if (board.makeMove(row, col)) {
                 updateGamePanel(board);
 
+                // 判断游戏是否结束
                 if (hasWinner() || isDraw())
                     return;
-                board.currentPlayer = (board.currentPlayer == 'X') ? 'O' : 'X';  // 交换玩家
+
+                board.currentPlayer = (board.currentPlayer == 'X') ? 'O' : 'X'; // 交换玩家
 
                 // 如果是 PVE 则电脑下棋
                 if (gameType == 1) {
                     ai.move();
                     updateGamePanel(board);
-                    if (hasWinner() || isDraw())  // 判断游戏是否结束
+
+                    // 判断游戏是否结束
+                    if (hasWinner() || isDraw())
                         return;
-                    board.currentPlayer = (board.currentPlayer == 'X') ? 'O' : 'X';  // 交换玩家
+
+                    board.currentPlayer = (board.currentPlayer == 'X') ? 'O' : 'X'; // 交换玩家
                 }
             }
         }
 
-        private boolean hasWinner() {//判断是否胜利
+        // 判断是否有玩家胜利
+        private boolean hasWinner() {
             char winner = board.checkWinner();
+
             if (winner != '-') {
                 gameBGM.stop();
                 playOverBGM();
 
+                // 更新胜利次数
                 if (gameType == 2) {
                     if (winner == 'X')
                         TicTacToeGame.xWins++;
                     else if (winner == 'O')
                         TicTacToeGame.oWins++;
                 } else if (gameType == 1) {
+                    // 根据难度更新胜利次数
                     if (ai.gameLevel == 1) {
                         if (winner == 'X')
                             TicTacToeGame.easyWins++;
@@ -174,28 +186,34 @@ public class TicTacToeGUI {
                     }
                 }
 
+                // 提示胜利信息并提供选项
                 int option = JOptionPane.showOptionDialog(frame, winner + " wins!", "选择下一步选项",
                         JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE,
                         null, new Object[]{"返回", "再玩一次"}, "再玩一次");
+
                 if (option == JOptionPane.YES_NO_OPTION) {
                     overBGM.close();
                     playClickSound();
-                    returnToMainMenu();//返回主菜单
-                } else{
+                    returnToMainMenu(); // 返回主菜单
+                } else {
                     overBGM.close();
                     playClickSound();
-                    resetGame();//重来
+                    resetGame();    // 重新开始
                 }
+
                 return true;
             }
+
             return false;
         }
 
-        private boolean isDraw() {//判断是否平局
+        // 判断是否平局
+        private boolean isDraw() {
             if (board.isBoardFull()) {
                 gameBGM.stop();
                 playOverBGM();
 
+                // 更新平局次数
                 if (gameType == 2)
                     TicTacToeGame.draws++;
                 else if (gameType == 1) {
@@ -207,54 +225,61 @@ public class TicTacToeGUI {
                         TicTacToeGame.hardDraws++;
                 }
 
+                // 提示平局信息并提供选项
                 int option = JOptionPane.showOptionDialog(frame, "平局!", "选择下一步选项",
                         JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE,
                         null, new Object[]{"返回", "再玩一次"}, "再玩一次");
+
                 if (option == JOptionPane.YES_NO_OPTION) {
                     overBGM.close();
                     playClickSound();
-                    returnToMainMenu();//返回主菜单
-                } else{
+                    returnToMainMenu(); // 返回主菜单
+                } else {
                     overBGM.close();
                     playClickSound();
-                    resetGame();//重来
+                    resetGame();    // 重新开始
                 }
             }
+
             return false;
         }
 
         // 重新开始游戏
         private void resetGame() {
             gameBGM.start();
-            board.clearBoard();  // 清空棋盘
+            board.clearBoard(); // 清空棋盘
             updateGamePanel(board);
-            board.currentPlayer = 'X'; // 重置当前玩家
+            board.currentPlayer = 'X';  // 重置当前玩家
         }
 
+        // 返回主菜单
         private void returnToMainMenu() {
             gameBGM.close();
-            frame.dispose(); // 关闭当前游戏窗口
-            instance=null;  // 释放实例
+            frame.dispose();    // 关闭当前游戏窗口
+            instance = null;  // 释放实例
             TicTacToeGame.main(new String[]{}); // 重新启动主菜单
         }
     }
 
+    // 播放点击音效
     private void playClickSound() {
         if (clickSound != null && clickSound.isRunning())
-            clickSound.stop(); // 停止正在播放的音效
+            clickSound.stop();  // 停止正在播放的音效
+
         if (clickSound != null) {
             clickSound.setFramePosition(0); // 重置音效位置
             clickSound.start(); // 播放音效
         }
     }
 
+    // 播放游戏结束音效
     private void playOverBGM() {
         if (overBGM != null && overBGM.isRunning())
             overBGM.stop(); // 停止正在播放的音效
+
         if (overBGM != null) {
-            overBGM.setFramePosition(0); // 重置音效位置
-            overBGM.start(); // 播放音效
+            overBGM.setFramePosition(0);    // 重置音效位置
+            overBGM.start();    // 播放音效
         }
     }
 }
-

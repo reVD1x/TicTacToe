@@ -1,12 +1,12 @@
 package TicTacToe;
 
 public class TicTacToeBoard {
-    public char[][] board; // 棋盘
-    public char currentPlayer; // 当前玩家
+    public char[][] board;      // 棋盘
+    public char currentPlayer;  // 当前玩家
 
     public TicTacToeBoard() {
         board = new char[3][3];
-        currentPlayer = 'X';  // X 玩家开始
+        currentPlayer = 'X';    // X 玩家开始
         clearBoard();
     }
 
@@ -21,9 +21,10 @@ public class TicTacToeBoard {
     public boolean makeMove(int row, int col) {
         if (board[row][col] == '-') {
             board[row][col] = currentPlayer;
-            return true;  // 下到正确位置
+            return true;    // 下到正确位置
         }
-        return false;  // 未下到正确位置
+
+        return false;   // 未下到正确位置
     }
 
     // 获取当前棋盘
